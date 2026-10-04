@@ -120,9 +120,36 @@ button:hover {
 }
 
 #note-count {
-  margin: 0 0 0.9rem;
+  margin: 0;
   color: #475467;
   font-size: 0.95rem;
+}
+
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.clear-all-button {
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #b42318;
+  background: #fff;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.clear-all-button:hover:not(:disabled) {
+  background: #fef3f2;
+}
+
+.clear-all-button:disabled {
+  border-color: #d0d5dd;
+  color: #98a2b3;
+  cursor: not-allowed;
 }
 
 #notes-list {
