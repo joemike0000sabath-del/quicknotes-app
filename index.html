@@ -18,14 +18,18 @@
     <section class="section-card" aria-labelledby="add-note-heading">
       <h2 id="add-note-heading">Add a note</h2>
       <form id="note-form">
-        <label for="note-input">Note</label>
-        <input id="note-input" name="note" type="text" maxlength="201" autocomplete="off">
-        <label for="category-select">Category</label>
-        <select id="category-select" name="category">
-          <option value="Personal">Personal</option>
-          <option value="Work">Work</option>
-          <option value="Study">Study</option>
-        </select>
+        <div class="form-field">
+          <label for="note-input">Note</label>
+          <input id="note-input" name="note" type="text" maxlength="201" autocomplete="off">
+        </div>
+        <div class="form-field">
+          <label for="category-select">Category</label>
+          <select id="category-select" name="category">
+            <option value="Personal">Personal</option>
+            <option value="Work">Work</option>
+            <option value="Study">Study</option>
+          </select>
+        </div>
         <button type="submit">Add Note</button>
       </form>
       <p id="error-message" role="alert"></p>
