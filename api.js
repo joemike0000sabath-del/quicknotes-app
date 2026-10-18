@@ -100,9 +100,32 @@ function renderNotes() {
     title.textContent = note.title;
     const body = document.createElement("p");
     body.textContent = note.body;
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-button";
+    deleteButton.type = "button";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", () => deleteNote(note.id));
 
-    item.append(title, body);
+    item.append(title, body, deleteButton);
     notesList.append(item);
+  }
+}
+
+async function deleteNote(noteId) {
+  setRequestRunning(true);
+  setStatus("Deleting note...", "loading");
+
+  try {
+    await request(`${API_URL}/${encodeURIComponent(noteId)}`, { method: "DELETE" });
+    // JSONPlaceholder reports successful deletes but does not persist them; remove it from this view.
+    notes = notes.filter((note) => note.id !== noteId);
+    renderNotes();
+    setStatus("Note deleted.", "success");
+  } catch (error) {
+    console.error("Unable to delete note.", error);
+    setStatus("Could not delete the note. Please check your connection and try again.", "error");
+  } finally {
+    setRequestRunning(false);
   }
 }
 
