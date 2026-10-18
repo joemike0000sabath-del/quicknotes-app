@@ -3,8 +3,12 @@ const API_URL = "https://jsonplaceholder.typicode.com/posts";
 const loadButton = document.querySelector("#load-btn");
 const notesList = document.querySelector("#notes-list");
 const statusMessage = document.querySelector("#status");
+const noteForm = document.querySelector("#note-form");
+const titleInput = document.querySelector("#title-input");
+const bodyInput = document.querySelector("#body-input");
 
 let notes = [];
+let pendingRequests = 0;
 
 async function request(url, options = {}) {
   const response = await fetch(url, options);
@@ -15,9 +19,10 @@ async function request(url, options = {}) {
 }
 
 loadButton.addEventListener("click", loadNotes);
+noteForm.addEventListener("submit", createNote);
 
 async function loadNotes() {
-  loadButton.disabled = true;
+  setRequestRunning(true);
   statusMessage.className = "status status--loading";
   statusMessage.textContent = "Loading notes...";
 
@@ -32,7 +37,47 @@ async function loadNotes() {
     statusMessage.className = "status status--error";
     statusMessage.textContent = "Could not load notes. Please check your connection and try again.";
   } finally {
-    loadButton.disabled = false;
+    setRequestRunning(false);
+  }
+}
+
+async function createNote(event) {
+  event.preventDefault();
+  const title = titleInput.value.trim();
+
+  if (!title) {
+    setStatus("A title is required.", "error");
+    titleInput.focus();
+    return;
+  }
+
+  if (title.length > 100) {
+    setStatus("The title must be 100 characters or fewer.", "error");
+    titleInput.focus();
+    return;
+  }
+
+  setRequestRunning(true);
+  setStatus("Creating note...", "loading");
+
+  try {
+    const response = await request(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=UTF-8" },
+      body: JSON.stringify({ title, body: bodyInput.value, userId: 1 }),
+    });
+    const createdNote = await response.json();
+
+    // JSONPlaceholder simulates writes but does not persist them across reloads.
+    notes.unshift(createdNote);
+    renderNotes();
+    noteForm.reset();
+    setStatus(`Note created (status ${response.status}, id ${createdNote.id}).`, "success");
+  } catch (error) {
+    console.error("Unable to create note.", error);
+    setStatus("Could not create the note. Please check your connection and try again.", "error");
+  } finally {
+    setRequestRunning(false);
   }
 }
 
@@ -59,4 +104,17 @@ function renderNotes() {
     item.append(title, body);
     notesList.append(item);
   }
+}
+
+function setStatus(message, state) {
+  statusMessage.className = `status status--${state}`;
+  statusMessage.textContent = message;
+}
+
+function setRequestRunning(isRunning) {
+  pendingRequests += isRunning ? 1 : -1;
+  const hasPendingRequests = pendingRequests > 0;
+  document.querySelectorAll("button").forEach((button) => {
+    button.disabled = hasPendingRequests;
+  });
 }
