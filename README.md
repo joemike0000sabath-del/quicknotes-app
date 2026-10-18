@@ -1,26 +1,24 @@
-# QuickNotes
+# QuickNotes System Design
 
-QuickNotes is a small, responsive note-taking app for capturing and organizing personal, work, and study notes. Notes are stored in your browser with `localStorage`, so they remain available when you reopen the app in the same browser.
+QuickNotes is a small browser client for creating, loading, and deleting notes, accompanied by backend API, data-model, and architecture designs for a production note-taking service. The client uses JSONPlaceholder to demonstrate HTTP requests; it does not connect to the production API described in the design documents.
 
-## Features
+## Run the API client
 
-- Add notes with a Personal, Work, or Study category.
-- Search notes by text, without case sensitivity.
-- Delete one note or clear all notes after confirmation.
-- Validate empty notes and notes longer than 200 characters.
-- Keep notes between visits using browser storage.
+1. Open this repository folder in Visual Studio Code.
+2. Serve `index.html` over localhost with the Live Server extension (or another static HTTP server).
+3. In the browser, select **Load notes** to fetch ten sample posts, or use the form to create a note and its **Delete** button to remove one.
 
-## Getting started
+The page has no build step or package installation. JSONPlaceholder simulates successful POST and DELETE requests without persisting those changes; created/deleted notes are updated in the current page view only and a page reload restores the server's sample data.
 
-Open `index.html` in a modern web browser. No build step or package installation is required.
+## Design documents
 
-## Project files
+- [API design](docs/api-design.md) — production REST endpoints, examples, and error responses.
+- [Data model](docs/data-model.md) — PostgreSQL entities, relationships, SQL schema, indexes, and queries.
+- [Architecture](docs/architecture.md) — requirements, scale estimates, system diagram, request flows, and trade-offs.
 
-| File | Description |
-| --- | --- |
-| `index.html` | App structure, note form, search, and notes list. |
-| `style.css` | Responsive layout, category colors, and note card styles. |
-| `script.js` | Note creation, validation, deletion, search, and local storage. |
-| `README.md` | Project overview and usage instructions. |
+## What I learned
 
-Notes are saved only in the current browser's local storage; they are not synced across browsers or devices.
+- Read-heavy services can use caches and read replicas to reduce pressure on the primary database, while still routing consistency-sensitive reads to the primary.
+- Separating user-facing writes from asynchronous work with a durable queue can improve response time, but requires idempotent workers, retry policies, and a plan for eventual consistency.
+- Relational foreign keys and a junction table enforce ownership and many-to-many relationships, and indexes should match frequent filters and sort orders.
+- A browser client should treat API data as untrusted text, validate user input, expose loading and failure states, and disable controls while requests are in progress.
